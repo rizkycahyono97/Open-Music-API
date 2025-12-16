@@ -10,6 +10,19 @@ class AlbumsService {
     this._pool = new Pool();
   }
 
+  async verifyAlbumExists(albumId) {
+    const query = {
+      text: 'SELECT id FROM albums WHERE id = $1',
+      values: [albumId]
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rows.length) {
+      throw new NotFoundError('Album Tidak Ditemukan');
+    }
+  }
+
   async addAlbum({ name, year }) {
     const id = `album-${nanoid(16)}`;
     const createdAt = new Date().toISOString();
@@ -83,6 +96,60 @@ class AlbumsService {
         'Album yang anda cari tidak ada, Gagal memperbarui album'
       );
     }
+  }
+
+  async addAlbumLike(albumId, userId) {
+    await this.verifyAlbumExists(albumId);
+
+    // cari jika sudah ada
+    const checkQuery = {
+      text: 'SELECT id FROM user_album_likes WHERE album_id = $1 AND user_id = $2',
+      values: [albumId, userId]
+    };
+    const checkResult = await this._pool.query(checkQuery);
+
+    if (checkResult.rows.length) {
+      throw new InvariantError('Anda sudah menyukai album ini');
+    }
+
+    const id = `like-${nanoid(16)}`;
+    const createdAt = new Date().toISOString();
+    const query = {
+      text: 'INSERT INTO user_album_likes VALUES($1, $2, $3, $4, $4) RETURNING id',
+      values: [id, userId, albumId, createdAt]
+    };
+
+    await this._pool.query(query);
+  }
+
+  async deleteAlbumLike(albumId, userId) {
+    await this.verifyAlbumExists(albumId);
+
+    const query = {
+      text: 'DELETE FROM user_album_likes WHERE album_id = $1 AND user_id = $2 RETURNING id',
+      values: [albumId, userId]
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rows.length) {
+      throw new NotFoundError(
+        'Batal menyukai gagal, anda belum menyukai album ini'
+      );
+    }
+  }
+
+  async getAlbumLikes(albumId) {
+    await this.verifyAlbumExists(albumId);
+
+    const query = {
+      text: 'SELECT COUNT(*) AS likes FROM user_album_likes WHERE album_id = $1',
+      values: [albumId]
+    };
+
+    const result = await this._pool.query(query);
+
+    return result.rows[0].likes;
   }
 }
 

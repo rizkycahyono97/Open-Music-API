@@ -134,6 +134,45 @@ class AlbumsHandler {
       return response;
     }
   }
+
+  async postAlbumLikeHandler(request, h) {
+    const { id: albumId } = request.params;
+    const { id: userId } = request.auth.credentials;
+
+    await this._service.addAlbumLike(albumId, userId);
+
+    const response = h.response({
+      status: 'success',
+      message: 'Album berhasil ditambahkan'
+    });
+    response.code(201);
+    return response;
+  }
+
+  async deleteAlbumLikeHandler(request, h) {
+    const { id: albumId } = request.params;
+    const { id: userId } = request.auth.credentials;
+
+    await this._service.deleteAlbumLike(albumId, userId);
+
+    return {
+      status: 'success',
+      message: 'Batal menyukai album berhasil'
+    };
+  }
+
+  async getAlbumLikesHandler(request, h) {
+    const { id: albumId } = request.params;
+
+    const likes = await this._service.getAlbumLikes(albumId);
+
+    return {
+      status: 'success',
+      data: {
+        likes: parseInt(likes, 10)
+      }
+    };
+  }
 }
 
 export default AlbumsHandler;
