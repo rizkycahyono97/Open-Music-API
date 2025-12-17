@@ -27,6 +27,9 @@ import AuthenticationsValidator from './validator/authentications/index.js';
 import PlaylistsService from './services/postgres/PlaylistsService.js';
 import PlaylistValidator from './validator/playlists/index.js';
 
+// cache
+// import CacheService from './services/redis/cacheService.js';
+
 // error
 import ClientError from './exceptions/ClientError.js';
 import playlists from './api/playlists/index.js';

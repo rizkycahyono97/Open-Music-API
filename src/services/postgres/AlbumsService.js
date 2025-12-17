@@ -2,12 +2,14 @@ import pkg from 'pg';
 import { nanoid } from 'nanoid';
 import InvariantError from '../../exceptions/InvariantError.js';
 import NotFoundError from '../../exceptions/NotFoundError.js';
+import CacheService from '../redis/cacheService.js';
 
 const { Pool } = pkg;
 
 class AlbumsService {
   constructor() {
     this._pool = new Pool();
+    this._cacheService = new CacheService();
   }
 
   async verifyAlbumExists(albumId) {
@@ -112,7 +114,7 @@ class AlbumsService {
       throw new InvariantError('Anda sudah menyukai album ini');
     }
 
-    const id = `like-${nanoid(16)}`;
+    const id = `album-likes-${nanoid(16)}`;
     const createdAt = new Date().toISOString();
     const query = {
       text: 'INSERT INTO user_album_likes VALUES($1, $2, $3, $4, $4) RETURNING id',
@@ -120,6 +122,8 @@ class AlbumsService {
     };
 
     await this._pool.query(query);
+
+    await this._cacheService.del(`album-likes${albumId}`);
   }
 
   async deleteAlbumLike(albumId, userId) {
@@ -137,19 +141,38 @@ class AlbumsService {
         'Batal menyukai gagal, anda belum menyukai album ini'
       );
     }
+
+    await this._cacheService.del(`album-likes${albumId}`);
   }
 
   async getAlbumLikes(albumId) {
-    await this.verifyAlbumExists(albumId);
+    try {
+      const result = await this._cacheService.get(`album-likes${albumId}`);
+      return {
+        likes: JSON.parse(result),
+        source: 'cache'
+      };
+    } catch (error) {
+      await this.verifyAlbumExists(albumId);
 
-    const query = {
-      text: 'SELECT COUNT(*) AS likes FROM user_album_likes WHERE album_id = $1',
-      values: [albumId]
-    };
+      const query = {
+        text: 'SELECT COUNT(*) AS likes FROM user_album_likes WHERE album_id = $1',
+        values: [albumId]
+      };
 
-    const result = await this._pool.query(query);
+      const result = await this._pool.query(query);
+      const likesCount = parseInt(result.rows[0].likes, 10);
 
-    return result.rows[0].likes;
+      await this._cacheService.set(
+        `album-likes${albumId}`,
+        JSON.stringify(likesCount)
+      );
+
+      return {
+        likes: likesCount,
+        source: 'db'
+      };
+    }
   }
 }
 
