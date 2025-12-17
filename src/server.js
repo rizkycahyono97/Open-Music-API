@@ -27,6 +27,11 @@ import AuthenticationsValidator from './validator/authentications/index.js';
 import PlaylistsService from './services/postgres/PlaylistsService.js';
 import PlaylistValidator from './validator/playlists/index.js';
 
+// export
+import _exports from './api/exports/index.js';
+import ProducerService from './services/rabbitmq/ProducerService.js';
+import ExportsValidator from './validator/exports/index.js';
+
 // cache
 // import CacheService from './services/redis/cacheService.js';
 
@@ -37,6 +42,8 @@ import playlists from './api/playlists/index.js';
 dotenv.config();
 
 const init = async () => {
+  const playlistsService = new PlaylistsService();
+
   const server = Hapi.server({
     port: process.env.PORT,
     host: process.env.HOST,
@@ -108,6 +115,15 @@ const init = async () => {
       options: {
         service: PlaylistsService,
         validator: PlaylistValidator
+      }
+    },
+    {
+      plugin: _exports,
+      options: {
+        service: ProducerService,
+        validator: ExportsValidator,
+        playlistValidator: PlaylistValidator,
+        playlistsService: playlistsService
       }
     }
   ]);
