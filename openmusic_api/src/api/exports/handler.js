@@ -13,19 +13,22 @@ class ExportsHandler {
     this._validator.validateExportPlaylistPayload(request.payload);
 
     const { playlistId } = request.params;
-    const { targetMail } = request.payload;
+    const { targetEmail } = request.payload;
     const { id: credentialId } = request.auth.credentials;
 
     await this._playlistsService.verifyPlaylistOwner(playlistId, credentialId);
 
-    const message = {
-      playlistId,
-      targetMail
-    };
+    // const message = {
+    //   playlistId,
+    //   targetMail
+    // };
 
     await this._service.sendMessage(
       'export:playlists',
-      JSON.stringify(message)
+      JSON.stringify({
+        playlistId,
+        targetMail: targetEmail
+      })
     );
 
     const response = h.response({

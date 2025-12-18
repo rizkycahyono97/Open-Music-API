@@ -2,12 +2,18 @@ import { Pool } from 'pg';
 
 class PlaylistService {
   constructor() {
-    this._service = new Pool();
+    this._pool = new Pool({
+      host: process.env.PGHOST,
+      user: process.env.PGUSER,
+      password: process.env.PGPASSWORD,
+      database: process.env.PGDATABASE,
+      port: process.env.PGPORT
+    });
   }
 
   async getPlaylistSong(playlistId) {
     const playlistQuery = {
-      text: 'SELECT id, name FROM playlists WHERE id = $1',
+      text: 'SELECT id, name FROM playlist WHERE id = $1',
       values: [playlistId]
     };
     const playlistResult = await this._pool.query(playlistQuery);

@@ -5,11 +5,20 @@ class MailSender {
   constructor() {
     this._transporter = nodemailer.createTransport({
       host: config.mail.host,
-      port: config.mail.port,
+      port: Number(config.mail.port),
+      secure: false,
       auth: {
         user: config.mail.user,
-        password: config.mail.password
+        pass: config.mail.password
+      },
+      tls: {
+        rejectUnauthorized: false
       }
+    });
+
+    console.log('MAIL TRANSPORT:', {
+      host: config.mail.host,
+      port: config.mail.port
     });
   }
 

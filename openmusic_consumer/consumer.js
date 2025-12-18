@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import amqp from 'amqplib';
 import PlaylistService from './PlaylistService.js';
 import MailSender from './MailSender.js';
@@ -16,6 +19,9 @@ const init = async () => {
     'export:playlists',
     async message => {
       try {
+        const payload = JSON.parse(message.content.toString());
+        console.log('RABBIT PAYLOAD:', payload);
+
         const { playlistId, targetMail } = JSON.parse(
           message.content.toString()
         );
