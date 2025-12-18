@@ -1,10 +1,18 @@
 import ClientError from '../../exceptions/ClientError.js';
 import autoBind from 'auto-bind';
+import StorageService from '../../services/storage/StorageService.js';
+import UploadValidator from '../../validator/uploads/index.js';
+import InvariantError from '../../exceptions/InvariantError.js';
+import path from 'path';
 
 class AlbumsHandler {
   constructor(service, validator) {
     this._service = service;
     this._validator = validator;
+    this._storageService = new StorageService(
+      path.resolve(process.cwd(), 'public/file/images')
+    );
+    this._uploadValidator = UploadValidator;
 
     autoBind(this);
   }
@@ -180,6 +188,30 @@ class AlbumsHandler {
     }
 
     return response;
+  }
+
+  async postAlbumCoverHandler(request, h) {
+    const { cover } = request.payload;
+    const { id } = request.params;
+
+    if (!cover) {
+      throw new InvariantError('Cover harus berupa file gambar');
+    }
+
+    this._uploadValidator.validateImageHeaders(cover.hapi.headers);
+
+    const filename = await this._storageService.writeFile(cover, cover.hapi);
+
+    const coverUrl = `http://${process.env.HOST}:${process.env.PORT}/albums/covers/${filename}`;
+
+    await this._service.updateAlbumCover(id, coverUrl);
+
+    return h
+      .response({
+        status: 'success',
+        message: 'Sampul berhasil diUpload'
+      })
+      .code(201);
   }
 }
 

@@ -174,6 +174,19 @@ class AlbumsService {
       };
     }
   }
+
+  async updateAlbumCover(id, coverUrl) {
+    const query = {
+      text: 'UPDATE albums SET cover_url = $1 WHERE id = $2 RETURNING id',
+      values: [coverUrl, id]
+    };
+
+    const result = this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new NotFoundError('Album tidak ditemukan');
+    }
+  }
 }
 
 export default AlbumsService;

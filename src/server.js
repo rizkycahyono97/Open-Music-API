@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import Hapi from '@hapi/hapi';
 import Jwt from '@hapi/jwt';
+import Inert from '@hapi/inert';
 
 // album
 import AlbumsService from './services/postgres/AlbumsService.js';
@@ -58,6 +59,9 @@ const init = async () => {
   await server.register([
     {
       plugin: Jwt
+    },
+    {
+      plugin: Inert
     }
   ]);
 

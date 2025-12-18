@@ -14,11 +14,13 @@
   "license": "ISC",
   "dependencies": {
     "@hapi/hapi": "^21.4.3",
+    "@hapi/inert": "^7.1.0",
     "@hapi/jwt": "^3.2.1",
     "amqplib": "^0.10.9",
     "auto-bind": "^5.0.1",
     "bcrypt": "^6.0.0",
     "dotenv": "^17.2.3",
+    "inert": "^2.0.0",
     "joi": "^18.0.1",
     "nanoid": "^5.1.6",
     "nodemailer": "^7.0.11",
