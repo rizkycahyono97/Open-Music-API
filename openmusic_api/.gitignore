@@ -32,3 +32,6 @@ test-output/
 
 # ZIP or test export files
 test/*.zip
+
+# public image
+public/
