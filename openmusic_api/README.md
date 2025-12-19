@@ -161,7 +161,7 @@ GET /albums/covers/{filename}
 
 ## 🧪 Testing
 
-API ini dapat diuji menggunakan, Import :
+API ini dapat diuji menggunakan, Import **Collection** dan **Environment** di **Postman**:
 
 - Postman
 
@@ -185,5 +185,3 @@ Pastikan:
 Dikembangkan sebagai bagian dari submission Dicoding Backend.
 
 ---
-
-✨ Happy coding & semoga submission kamu diterima tanpa revisi!
