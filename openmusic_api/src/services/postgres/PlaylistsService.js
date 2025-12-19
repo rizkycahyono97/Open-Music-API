@@ -192,6 +192,27 @@ class PlaylistsService {
     const result = await this._pool.query(query);
     return result.rows;
   }
+
+  async verifyPlaylistAccess(playlistId, userId) {
+    try {
+      await this.verifyPlaylistOwner(playlistId.userId);
+    } catch (error) {
+      if (!(error instanceof AuthorizationError)) {
+        throw error;
+      }
+    }
+
+    const query = {
+      text: 'SELECT id FROM collaborations WHERE playlist_id = $1 AND user_id = $2',
+      values: [playlistId, userId]
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new AuthorizationError('anda tidak berhak mengakses playlist ini');
+    }
+  }
 }
 
 export default PlaylistsService;

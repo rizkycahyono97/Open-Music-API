@@ -33,12 +33,17 @@ import _exports from './api/exports/index.js';
 import ProducerService from './services/rabbitmq/ProducerService.js';
 import ExportsValidator from './validator/exports/index.js';
 
+// collaboration
+import CollaborationsService from './services/postgres/CollaborationsService.js';
+import CollaborationsValidator from './validator/collaborations/index.js';
+
 // cache
 // import CacheService from './services/redis/cacheService.js';
 
 // error
 import ClientError from './exceptions/ClientError.js';
 import playlists from './api/playlists/index.js';
+import collaborations from './api/collaborations/index.js';
 
 dotenv.config();
 
@@ -128,6 +133,14 @@ const init = async () => {
         validator: ExportsValidator,
         playlistValidator: PlaylistValidator,
         playlistsService: playlistsService
+      }
+    },
+    {
+      plugin: collaborations,
+      options: {
+        CollaborationsService,
+        PlaylistsService,
+        validator: CollaborationsValidator
       }
     }
   ]);
