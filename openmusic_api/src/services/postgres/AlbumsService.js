@@ -181,7 +181,7 @@ class AlbumsService {
       values: [coverUrl, id]
     };
 
-    const result = this._pool.query(query);
+    const result = await this._pool.query(query);
 
     if (!result.rowCount) {
       throw new NotFoundError('Album tidak ditemukan');

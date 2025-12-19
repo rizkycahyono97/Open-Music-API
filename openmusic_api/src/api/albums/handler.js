@@ -194,6 +194,8 @@ class AlbumsHandler {
     const { cover } = request.payload;
     const { id } = request.params;
 
+    // console.log('updateAlbumCover ', request.payload);
+
     if (!cover) {
       throw new InvariantError('Cover harus berupa file gambar');
     }
