@@ -46,7 +46,7 @@ class AlbumsService {
 
   async getAlbumById(id) {
     const albumQuery = {
-      text: 'SELECT id, name, year, cover_url FROM albums WHERE id = $1',
+      text: 'SELECT id, name, year, "coverUrl" FROM albums WHERE id = $1',
       values: [id]
     };
     const albumResult = await this._pool.query(albumQuery);
@@ -177,7 +177,7 @@ class AlbumsService {
 
   async updateAlbumCover(id, coverUrl) {
     const query = {
-      text: 'UPDATE albums SET cover_url = $1 WHERE id = $2 RETURNING id',
+      text: 'UPDATE albums SET "coverUrl" = $1 WHERE id = $2 RETURNING id',
       values: [coverUrl, id]
     };
 
