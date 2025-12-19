@@ -204,9 +204,9 @@ class AlbumsHandler {
 
     const filename = await this._storageService.writeFile(cover, cover.hapi);
 
-    const coverUrl = `http://${process.env.HOST}:${process.env.PORT}/albums/covers/${filename}`;
+    const cover_url = `http://${process.env.HOST}:${process.env.PORT}/albums/covers/${filename}`;
 
-    await this._service.updateAlbumCover(id, coverUrl);
+    await this._service.updateAlbumCover(id, cover_url);
 
     return h
       .response({

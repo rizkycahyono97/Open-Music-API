@@ -46,7 +46,7 @@ class AlbumsService {
 
   async getAlbumById(id) {
     const albumQuery = {
-      text: 'SELECT id, name, year, "coverUrl" FROM albums WHERE id = $1',
+      text: 'SELECT id, name, year, cover_url FROM albums WHERE id = $1',
       values: [id]
     };
     const albumResult = await this._pool.query(albumQuery);
@@ -55,7 +55,7 @@ class AlbumsService {
       throw new NotFoundError('Album tidak ditemukan');
     }
 
-    const album = albumResult.rows[0];
+    const { id: albumId, name, year, cover_url } = albumResult.rows[0];
 
     const songsQuery = {
       text: 'SELECT id, title, performer FROM songs WHERE album_id = $1',
@@ -63,9 +63,13 @@ class AlbumsService {
     };
     const songsResult = await this._pool.query(songsQuery);
 
-    album.songs = songsResult.rows || [];
-
-    return album;
+    return {
+      id: albumId,
+      name,
+      year,
+      coverUrl: cover_url,
+      songs: songsResult.rows || []
+    };
   }
 
   async editAlbumById(id, { name, year }) {
@@ -175,10 +179,10 @@ class AlbumsService {
     }
   }
 
-  async updateAlbumCover(id, coverUrl) {
+  async updateAlbumCover(id, cover_url) {
     const query = {
-      text: 'UPDATE albums SET "coverUrl" = $1 WHERE id = $2 RETURNING id',
-      values: [coverUrl, id]
+      text: 'UPDATE albums SET cover_url = $1 WHERE id = $2 RETURNING id',
+      values: [cover_url, id]
     };
 
     const result = await this._pool.query(query);
